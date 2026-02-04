@@ -38,34 +38,13 @@ button {
   margin: 10px;
 }
 
-/* YES button */
 #yes {
   background: #ff4d6d;
   color: white;
-  position: absolute;
 }
 
-/* NO button */
 #no {
   background: #ddd;
-  position: absolute;
-  left: 50%;
-  top: 60%;
-  transform: translate(-50%, -50%);
-  transition: opacity 1s;
-}
-
-/* YES chaos */
-@keyframes shake {
-  0% { transform: translate(0); }
-  25% { transform: translate(-3px,3px); }
-  50% { transform: translate(3px,-3px); }
-  75% { transform: translate(-3px,-3px); }
-  100% { transform: translate(0); }
-}
-
-.annoying {
-  animation: shake 0.25s infinite;
 }
 
 /* Fireworks */
@@ -113,7 +92,7 @@ button {
   transition: opacity 0.2s;
 }
 
-/* Final takeover */
+/* Final screen */
 #final {
   position: fixed;
   inset: 0;
@@ -133,14 +112,13 @@ button {
 
 <div class="flash" id="flash"></div>
 
-<!-- Put wgft.mp3 in the SAME folder -->
 <audio id="music" src="wgft.mp3"></audio>
 
 <div class="card" id="card">
   <h1>Lilly-may… will you be my Valentine? 💘</h1>
   <p>You know the answer 😌</p>
   <button id="yes" onclick="yesClicked()">Yes 💖</button>
-  <button id="no" onmouseover="moveNo()">No 💔</button>
+  <button id="no" onclick="noClicked()">No 💔</button>
 </div>
 
 <div id="final">
@@ -153,28 +131,16 @@ button {
 let yesCount = 0;
 
 function yesClicked() {
-  const yes = document.getElementById("yes");
-  const no = document.getElementById("no");
   const music = document.getElementById("music");
-
   if (music.paused) music.play();
+
   yesCount++;
 
-  yes.classList.add("annoying");
-  yes.style.transform = `scale(${1 + yesCount * 0.2})`;
-
   flashScreen();
-  vibrate();
-  fireworks(20 + yesCount * 15);
-  confetti(40);
+  fireworks(40);
+  confetti(60);
 
-  for (let i = 0; i < yesCount; i++) spawnFakeYes();
-
-  if (yesCount >= 4) {
-    no.style.opacity = "0";
-  }
-
-  if (yesCount >= 6) {
+  if (yesCount >= 2) {
     document.getElementById("card").style.display = "none";
     document.getElementById("final").style.display = "flex";
     fireworks(100);
@@ -182,29 +148,9 @@ function yesClicked() {
   }
 }
 
-// NO button runs away
-function moveNo() {
-  const no = document.getElementById("no");
-  no.style.left = Math.random() * (window.innerWidth - 100) + "px";
-  no.style.top = Math.random() * (window.innerHeight - 50) + "px";
+function noClicked() {
+  alert("Wrong answer 😌💘");
 }
-
-// YES follows mouse
-document.addEventListener("mousemove", e => {
-  const yes = document.getElementById("yes");
-  if (!yes) return;
-  yes.style.left = (e.clientX - 40) + "px";
-  yes.style.top = (e.clientY - 20) + "px";
-});
-
-// YES follows finger (mobile)
-document.addEventListener("touchmove", e => {
-  const yes = document.getElementById("yes");
-  if (!yes) return;
-  const t = e.touches[0];
-  yes.style.left = (t.clientX - 40) + "px";
-  yes.style.top = (t.clientY - 20) + "px";
-});
 
 // Fireworks
 function fireworks(n) {
@@ -233,28 +179,11 @@ function confetti(n) {
   }
 }
 
-// Fake YES buttons
-function spawnFakeYes() {
-  const b = document.createElement("button");
-  b.innerText = "YES 💖";
-  b.style.position = "absolute";
-  b.style.left = Math.random()*window.innerWidth+"px";
-  b.style.top = Math.random()*window.innerHeight+"px";
-  b.onclick = yesClicked;
-  document.body.appendChild(b);
-  setTimeout(()=>b.remove(),2000);
-}
-
 // Flash
 function flashScreen() {
   const f = document.getElementById("flash");
   f.classList.add("active");
   setTimeout(()=>f.classList.remove("active"),200);
-}
-
-// Vibration
-function vibrate() {
-  if (navigator.vibrate) navigator.vibrate(200);
 }
 </script>
 
