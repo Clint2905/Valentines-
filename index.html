@@ -15,6 +15,7 @@ body {
   align-items: center;
   background: linear-gradient(135deg, #ff758c, #ff7eb3);
   font-family: -apple-system, BlinkMacSystemFont, Arial, sans-serif;
+  color: pink;
 }
 
 .card {
@@ -24,10 +25,9 @@ body {
   text-align: center;
   box-shadow: 0 15px 30px rgba(0,0,0,0.25);
   max-width: 90%;
-  z-index: 5;
+  z-index: 2;
+  color: pink;
 }
-
-h1 { color: #ff4d6d; }
 
 button {
   font-size: 18px;
@@ -36,16 +36,52 @@ button {
   border: none;
   cursor: pointer;
   margin: 10px;
+  color: pink;
 }
 
-#yes {
-  background: #ff4d6d;
-  color: white;
+.yes {
+  background-color: #ff4d6d;
 }
 
-#no {
-  background: #ddd;
+.no {
+  background-color: #ddd;
 }
+
+/* Floating emojis */
+.heart, .kiss {
+  position: absolute;
+  bottom: -20px;
+  animation: floatUp 6s linear infinite;
+  opacity: 0.9;
+}
+
+@keyframes floatUp {
+  0% { transform: translateY(0); opacity: 1; }
+  100% { transform: translateY(-110vh); opacity: 0; }
+}
+
+/* iMessage style */
+.imessage {
+  background: #f5f5f7;
+  border-radius: 20px;
+  padding: 20px;
+  width: 280px;
+  margin: auto;
+  text-align: left;
+  color: pink;
+}
+
+.bubble {
+  padding: 10px 14px;
+  border-radius: 18px;
+  margin-bottom: 10px;
+  max-width: 85%;
+  font-size: 15px;
+  color: pink;
+}
+
+.from-them { background: #ffe5f0; }
+.from-me { background: #ff4d6d; margin-left: auto; }
 
 /* Fireworks */
 .firework {
@@ -62,97 +98,72 @@ button {
     opacity: 0;
   }
 }
-
-/* Confetti */
-.confetti {
-  position: absolute;
-  width: 8px;
-  height: 8px;
-  animation: fall 3s linear forwards;
-}
-
-@keyframes fall {
-  to {
-    transform: translateY(110vh) rotate(720deg);
-    opacity: 0;
-  }
-}
-
-/* Flash */
-.flash {
-  position: fixed;
-  inset: 0;
-  background: white;
-  opacity: 0;
-  z-index: 10;
-}
-
-.flash.active {
-  opacity: 0.8;
-  transition: opacity 0.2s;
-}
-
-/* Final screen */
-#final {
-  position: fixed;
-  inset: 0;
-  background: linear-gradient(135deg, #ff4d6d, #ff85a1);
-  display: none;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-  color: white;
-  z-index: 20;
-  text-align: center;
-}
 </style>
 </head>
 
 <body>
 
-<div class="flash" id="flash"></div>
-
 <audio id="music" src="wgft.mp3"></audio>
 
 <div class="card" id="card">
-  <h1>Lilly-may… will you be my Valentine? 💘</h1>
-  <p>You know the answer 😌</p>
-  <button id="yes" onclick="yesClicked()">Yes 💖</button>
-  <button id="no" onclick="noClicked()">No 💔</button>
-</div>
-
-<div id="final">
-  <h1>VALENTINE CONFIRMED 💘</h1>
-  <p>No refunds. No take backs.</p>
-  <p>Screenshot this 😌</p>
+  <h2>Lilly-may… will you be my Valentine? 💘</h2>
+  <p>Don’t overthink it 😌</p>
+  <button class="yes" onclick="yesClicked()">Yes 💖</button>
+  <button class="no" onclick="noClicked()">No 💔</button>
 </div>
 
 <script>
-let yesCount = 0;
+const card = document.getElementById("card");
+const music = document.getElementById("music");
+
+function annoyUser(type) {
+  const messagesYes = [
+    "Are you sure? 😘",
+    "Really, REALLY sure? 💖",
+    "You won’t regret this, right? 😏",
+    "Tell me again, am I your Valentine? 💘"
+  ];
+  
+  const messagesNo = [
+    "Come on, be serious 😌💘",
+    "I won’t take no for an answer 😎",
+    "Why are you lying? 💔",
+    "Don’t you want to be my Valentine? 😏"
+  ];
+  
+  const msgArray = type === "yes" ? messagesYes : messagesNo;
+  const randomMsg = msgArray[Math.floor(Math.random() * msgArray.length)];
+  
+  const bubble = document.createElement("div");
+  bubble.className = type === "yes" ? "bubble from-me" : "bubble from-them";
+  bubble.innerText = randomMsg;
+  
+  const chat = document.querySelector(".imessage") || createChat();
+  chat.appendChild(bubble);
+  chat.scrollTop = chat.scrollHeight;
+  
+  fireworks(15);
+  startEmojis();
+  
+  // Repeat annoy every 3-5 seconds
+  setTimeout(() => annoyUser(type), Math.random()*2000 + 3000);
+}
+
+function createChat() {
+  card.innerHTML = `<h2>Messages 💬</h2><div class="imessage"></div>`;
+  return document.querySelector(".imessage");
+}
 
 function yesClicked() {
-  const music = document.getElementById("music");
   if (music.paused) music.play();
-
-  yesCount++;
-
-  flashScreen();
-  fireworks(40);
-  confetti(60);
-
-  if (yesCount >= 2) {
-    document.getElementById("card").style.display = "none";
-    document.getElementById("final").style.display = "flex";
-    fireworks(100);
-    confetti(150);
-  }
+  annoyUser("yes");
 }
 
 function noClicked() {
-  alert("Wrong answer 😌💘");
+  annoyUser("no");
 }
 
-// Fireworks
+/* Fireworks */
 function fireworks(n) {
   for (let i = 0; i < n; i++) {
     const f = document.createElement("div");
@@ -167,23 +178,16 @@ function fireworks(n) {
   }
 }
 
-// Confetti
-function confetti(n) {
-  for (let i = 0; i < n; i++) {
-    const c = document.createElement("div");
-    c.className = "confetti";
-    c.style.left = Math.random()*100+"vw";
-    c.style.background = `hsl(${Math.random()*360},100%,60%)`;
-    document.body.appendChild(c);
-    setTimeout(()=>c.remove(),3000);
-  }
-}
-
-// Flash
-function flashScreen() {
-  const f = document.getElementById("flash");
-  f.classList.add("active");
-  setTimeout(()=>f.classList.remove("active"),200);
+/* Floating hearts & kisses */
+function startEmojis() {
+  const emoji = document.createElement("div");
+  emoji.className = Math.random() > 0.5 ? "heart" : "kiss";
+  emoji.innerText = emoji.className === "heart" ? "❤️" : "😘";
+  emoji.style.left = Math.random() * 100 + "vw";
+  emoji.style.fontSize = Math.random() * 20 + 18 + "px";
+  emoji.style.animationDuration = Math.random() * 3 + 4 + "s";
+  document.body.appendChild(emoji);
+  setTimeout(() => emoji.remove(), 7000);
 }
 </script>
 
