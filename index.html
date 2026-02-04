@@ -1,249 +1,175 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Be My Valentine</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <title>Be My Valentine</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<style>
-body {
-  margin: 0;
-  height: 100vh;
-  overflow: hidden;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background: linear-gradient(135deg, #ff758c, #ff7eb3);
-  font-family: -apple-system, BlinkMacSystemFont, Arial, sans-serif;
-  color: pink;
-}
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: linear-gradient(135deg, #ff758c, #ff7eb3);
+      font-family: -apple-system, BlinkMacSystemFont, Arial, sans-serif;
+    }
 
-.card {
-  background: white;
-  padding: 40px 30px;
-  border-radius: 20px;
-  text-align: center;
-  box-shadow: 0 15px 30px rgba(0,0,0,0.25);
-  max-width: 90%;
-  z-index: 2;
-  color: pink;
-}
+    .card {
+      background: white;
+      padding: 40px 30px;
+      border-radius: 20px;
+      text-align: center;
+      box-shadow: 0 15px 30px rgba(0,0,0,0.25);
+      max-width: 90%;
+      z-index: 2;
+    }
 
-button {
-  font-size: 18px;
-  padding: 12px 24px;
-  border-radius: 12px;
-  border: none;
-  cursor: pointer;
-  margin: 10px;
-  color: pink;
-}
+    h1 {
+      color: #ff4d6d;
+      font-size: 26px;
+      margin-bottom: 15px;
+    }
 
-.yes {
-  background-color: #ff4d6d;
-}
+    p {
+      font-size: 17px;
+    }
 
-.no {
-  background-color: #ddd;
-}
+    button {
+      font-size: 18px;
+      padding: 12px 24px;
+      border-radius: 12px;
+      border: none;
+      cursor: pointer;
+      margin: 10px;
+    }
 
-/* Floating emojis */
-.heart, .kiss {
-  position: absolute;
-  bottom: -20px;
-  animation: floatUp 6s linear forwards;
-  opacity: 0.9;
-}
+    #yes {
+      background-color: #ff4d6d;
+      color: white;
+    }
 
-@keyframes floatUp {
-  0% { transform: translateY(0); opacity: 1; }
-  100% { transform: translateY(-110vh); opacity: 0; }
-}
+    #no {
+      background-color: #ddd;
+      position: absolute;
+    }
 
-/* iMessage style */
-.imessage {
-  background: #f5f5f7;
-  border-radius: 20px;
-  padding: 20px;
-  width: 280px;
-  margin: auto;
-  text-align: left;
-  color: pink;
-}
+    .heart, .kiss {
+      position: absolute;
+      bottom: -20px;
+      animation: floatUp 6s linear infinite;
+      opacity: 0.9;
+    }
 
-.bubble {
-  padding: 10px 14px;
-  border-radius: 18px;
-  margin-bottom: 10px;
-  max-width: 85%;
-  font-size: 15px;
-  color: pink;
-}
+    @keyframes floatUp {
+      0% { transform: translateY(0); opacity: 1; }
+      100% { transform: translateY(-110vh); opacity: 0; }
+    }
 
-.from-them { background: #ffe5f0; }
-.from-me { background: #ff4d6d; margin-left: auto; }
+    /* iMessage style */
+    .imessage {
+      background: #f5f5f7;
+      border-radius: 20px;
+      padding: 20px;
+      width: 280px;
+      margin: auto;
+      text-align: left;
+    }
 
-/* Fireworks */
-.firework {
-  position: absolute;
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  animation: explode 1s ease-out forwards;
-}
+    .bubble {
+      padding: 10px 14px;
+      border-radius: 18px;
+      margin-bottom: 10px;
+      max-width: 85%;
+      font-size: 15px;
+    }
 
-@keyframes explode {
-  to {
-    transform: translate(var(--x), var(--y)) scale(0);
-    opacity: 0;
-  }
-}
+    .from-them {
+      background: #e5e5ea;
+      color: black;
+    }
 
-/* Countdown */
-#countdown {
-  font-size: 22px;
-  margin-top: 20px;
-  font-weight: bold;
-}
-</style>
+    .from-me {
+      background: #0b93f6;
+      color: white;
+      margin-left: auto;
+      text-align: right;
+    }
+  </style>
 </head>
 
 <body>
 
-<audio id="music" src="wgft.mp3"></audio>
+  <audio id="music" src="wgft.mp3"></audio>
 
-<div class="card" id="card">
-  <h2>Lilly-may… will you be my Valentine? 💘</h2>
-  <p>Don’t overthink it 😌</p>
-  <button class="yes" onclick="answerQuestion('yes')">Yes 💖</button>
-  <button class="no" onclick="answerQuestion('no')">No 💔</button>
-</div>
+  <div class="card" id="card">
+    <h1>Lilly-may… will you be my Valentine? 💘</h1>
+    <p>Don’t overthink it like you always do 😌</p>
+    <button id="yes" onclick="yesClicked()">Yes 💖</button>
+    <button id="no" onmouseover="moveNo()">No 💔</button>
+  </div>
 
-<script>
-const card = document.getElementById("card");
-const music = document.getElementById("music");
+  <script>
+    let yesCount = 0;
 
-const questionsYes = [
-  "Are you sure? 😘",
-  "Really, REALLY sure? 💖",
-  "You won’t regret this, right? 😏",
-  "Tell me again, am I your Valentine? 💘",
-  "Promise you’ll stay my Valentine? 💞"
-];
+    function yesClicked() {
+      const card = document.getElementById("card");
+      const music = document.getElementById("music");
+      if (music.paused) music.play();
 
-const questionsNo = [
-  "Come on, be serious 😌💘",
-  "I won’t take no for an answer 😎",
-  "Why are you lying? 💔",
-  "Don’t you want to be my Valentine? 😏",
-  "Please say yes 😢"
-];
+      yesCount++;
 
-let currentQuestion = 0;
-let currentSet = [];
-
-function answerQuestion(type) {
-  if (music.paused) music.play();
-
-  // If first answer, create chat container
-  if (!document.querySelector(".imessage")) {
-    card.innerHTML = `<h2>Messages 💬</h2><div class="imessage"></div>`;
-  }
-
-  currentSet = type === "yes" ? questionsYes : questionsNo;
-  const chat = document.querySelector(".imessage");
-
-  // Add bubble
-  const bubble = document.createElement("div");
-  bubble.className = type === "yes" ? "bubble from-me" : "bubble from-them";
-  bubble.innerText = currentSet[currentQuestion];
-  chat.appendChild(bubble);
-  chat.scrollTop = chat.scrollHeight;
-
-  fireworks(15);
-  startEmojis();
-
-  currentQuestion++;
-
-  // Show next buttons if more questions left
-  const existingBtns = document.querySelector(".btns");
-  if (existingBtns) existingBtns.remove();
-
-  if (currentQuestion < currentSet.length) {
-    const btns = document.createElement("div");
-    btns.className = "btns";
-    btns.innerHTML = `
-      <button class="yes" onclick="answerQuestion('yes')">Yes 💖</button>
-      <button class="no" onclick="answerQuestion('no')">No 💔</button>
-    `;
-    card.appendChild(btns);
-  } else {
-    showFinalMessage();
-  }
-}
-
-function showFinalMessage() {
-  card.innerHTML = `
-    <h2>You're going to be my Valentine 😘</h2>
-    <div id="countdown"></div>
-  `;
-  startCountdown();
-}
-
-/* Countdown to February 14 */
-function startCountdown() {
-  const countdown = document.getElementById("countdown");
-  const valentine = new Date(new Date().getFullYear(), 1, 14); // Feb 14
-
-  function updateCountdown() {
-    const now = new Date();
-    let diff = valentine - now;
-
-    if (diff < 0) {
-      countdown.innerText = "Happy Valentine’s Day! 💖";
-      clearInterval(interval);
-      return;
+      if (yesCount === 1) {
+        card.innerHTML = `
+          <h1>Wait 🤨</h1>
+          <p>Are you sure… or are you gonna get moody and say no later?</p>
+          <button onclick="yesClicked()">I’m sure 💖</button>
+        `;
+      } else if (yesCount === 2) {
+        card.innerHTML = `
+          <h1>Hmm 😏</h1>
+          <p>No switching up. No attitude. No fake yes.</p>
+          <button onclick="yesClicked()">Okay fine yes 💖</button>
+        `;
+      } else {
+        card.innerHTML = `
+          <h1>Messages 💬</h1>
+          <div class="imessage">
+            <div class="bubble from-them">So… are you my Valentine? 👀</div>
+            <div class="bubble from-me">Yeah 🙄💖</div>
+            <div class="bubble from-them">You promise you won’t say no later?</div>
+            <div class="bubble from-me">I promise 😘</div>
+            <div class="bubble from-them">Good. Valentine secured 🔒</div>
+          </div>
+          <p style="margin-top:15px; text-align:center;">Screenshot this and send it to me 😌</p>
+        `;
+      }
     }
 
-    const days = Math.floor(diff / (1000*60*60*24));
-    const hours = Math.floor((diff / (1000*60*60)) % 24);
-    const minutes = Math.floor((diff / (1000*60)) % 60);
-    const seconds = Math.floor((diff / 1000) % 60);
+    function moveNo() {
+      const noBtn = document.getElementById("no");
+      const x = Math.random() * (window.innerWidth - 120);
+      const y = Math.random() * (window.innerHeight - 60);
+      noBtn.style.left = x + "px";
+      noBtn.style.top = y + "px";
+    }
 
-    countdown.innerText = `${days}d ${hours}h ${minutes}m ${seconds}s until Valentine’s Day 💘`;
-  }
+    function createFloatingEmoji() {
+      const emoji = document.createElement("div");
+      emoji.className = Math.random() > 0.5 ? "heart" : "kiss";
+      emoji.innerText = emoji.className === "heart" ? "❤️" : "😘";
+      emoji.style.left = Math.random() * 100 + "vw";
+      emoji.style.fontSize = Math.random() * 20 + 18 + "px";
+      emoji.style.animationDuration = Math.random() * 3 + 4 + "s";
+      document.body.appendChild(emoji);
 
-  updateCountdown();
-  const interval = setInterval(updateCountdown, 1000);
-}
+      setTimeout(() => emoji.remove(), 7000);
+    }
 
-/* Fireworks */
-function fireworks(n) {
-  for (let i = 0; i < n; i++) {
-    const f = document.createElement("div");
-    f.className = "firework";
-    f.style.left = Math.random() * innerWidth + "px";
-    f.style.top = Math.random() * innerHeight + "px";
-    f.style.background = `hsl(${Math.random()*360},100%,60%)`;
-    f.style.setProperty("--x", Math.random()*200-100+"px");
-    f.style.setProperty("--y", Math.random()*200-100+"px");
-    document.body.appendChild(f);
-    setTimeout(() => f.remove(), 1000);
-  }
-}
-
-/* Floating hearts & kisses */
-function startEmojis() {
-  const emoji = document.createElement("div");
-  emoji.className = Math.random() > 0.5 ? "heart" : "kiss";
-  emoji.innerText = emoji.className === "heart" ? "❤️" : "😘";
-  emoji.style.left = Math.random() * 100 + "vw";
-  emoji.style.fontSize = Math.random() * 20 + 18 + "px";
-  emoji.style.animationDuration = Math.random() * 3 + 4 + "s";
-  document.body.appendChild(emoji);
-  setTimeout(() => emoji.remove(), 7000);
-}
-</script>
+    setInterval(createFloatingEmoji, 350);
+  </script>
 
 </body>
 </html>
