@@ -51,7 +51,7 @@ button {
 .heart, .kiss {
   position: absolute;
   bottom: -20px;
-  animation: floatUp 6s linear infinite;
+  animation: floatUp 6s linear forwards;
   opacity: 0.9;
 }
 
@@ -98,6 +98,13 @@ button {
     opacity: 0;
   }
 }
+
+/* Countdown */
+#countdown {
+  font-size: 22px;
+  margin-top: 20px;
+  font-weight: bold;
+}
 </style>
 </head>
 
@@ -108,59 +115,106 @@ button {
 <div class="card" id="card">
   <h2>Lilly-may… will you be my Valentine? 💘</h2>
   <p>Don’t overthink it 😌</p>
-  <button class="yes" onclick="yesClicked()">Yes 💖</button>
-  <button class="no" onclick="noClicked()">No 💔</button>
+  <button class="yes" onclick="answerQuestion('yes')">Yes 💖</button>
+  <button class="no" onclick="answerQuestion('no')">No 💔</button>
 </div>
 
 <script>
 const card = document.getElementById("card");
 const music = document.getElementById("music");
 
-function annoyUser(type) {
-  const messagesYes = [
-    "Are you sure? 😘",
-    "Really, REALLY sure? 💖",
-    "You won’t regret this, right? 😏",
-    "Tell me again, am I your Valentine? 💘"
-  ];
-  
-  const messagesNo = [
-    "Come on, be serious 😌💘",
-    "I won’t take no for an answer 😎",
-    "Why are you lying? 💔",
-    "Don’t you want to be my Valentine? 😏"
-  ];
-  
-  const msgArray = type === "yes" ? messagesYes : messagesNo;
-  const randomMsg = msgArray[Math.floor(Math.random() * msgArray.length)];
-  
+const questionsYes = [
+  "Are you sure? 😘",
+  "Really, REALLY sure? 💖",
+  "You won’t regret this, right? 😏",
+  "Tell me again, am I your Valentine? 💘",
+  "Promise you’ll stay my Valentine? 💞"
+];
+
+const questionsNo = [
+  "Come on, be serious 😌💘",
+  "I won’t take no for an answer 😎",
+  "Why are you lying? 💔",
+  "Don’t you want to be my Valentine? 😏",
+  "Please say yes 😢"
+];
+
+let currentQuestion = 0;
+let currentSet = [];
+
+function answerQuestion(type) {
+  if (music.paused) music.play();
+
+  // If first answer, create chat container
+  if (!document.querySelector(".imessage")) {
+    card.innerHTML = `<h2>Messages 💬</h2><div class="imessage"></div>`;
+  }
+
+  currentSet = type === "yes" ? questionsYes : questionsNo;
+  const chat = document.querySelector(".imessage");
+
+  // Add bubble
   const bubble = document.createElement("div");
   bubble.className = type === "yes" ? "bubble from-me" : "bubble from-them";
-  bubble.innerText = randomMsg;
-  
-  const chat = document.querySelector(".imessage") || createChat();
+  bubble.innerText = currentSet[currentQuestion];
   chat.appendChild(bubble);
   chat.scrollTop = chat.scrollHeight;
-  
+
   fireworks(15);
   startEmojis();
-  
-  // Repeat annoy every 3-5 seconds
-  setTimeout(() => annoyUser(type), Math.random()*2000 + 3000);
+
+  currentQuestion++;
+
+  // Show next buttons if more questions left
+  const existingBtns = document.querySelector(".btns");
+  if (existingBtns) existingBtns.remove();
+
+  if (currentQuestion < currentSet.length) {
+    const btns = document.createElement("div");
+    btns.className = "btns";
+    btns.innerHTML = `
+      <button class="yes" onclick="answerQuestion('yes')">Yes 💖</button>
+      <button class="no" onclick="answerQuestion('no')">No 💔</button>
+    `;
+    card.appendChild(btns);
+  } else {
+    showFinalMessage();
+  }
 }
 
-function createChat() {
-  card.innerHTML = `<h2>Messages 💬</h2><div class="imessage"></div>`;
-  return document.querySelector(".imessage");
+function showFinalMessage() {
+  card.innerHTML = `
+    <h2>You're going to be my Valentine 😘</h2>
+    <div id="countdown"></div>
+  `;
+  startCountdown();
 }
 
-function yesClicked() {
-  if (music.paused) music.play();
-  annoyUser("yes");
-}
+/* Countdown to February 14 */
+function startCountdown() {
+  const countdown = document.getElementById("countdown");
+  const valentine = new Date(new Date().getFullYear(), 1, 14); // Feb 14
 
-function noClicked() {
-  annoyUser("no");
+  function updateCountdown() {
+    const now = new Date();
+    let diff = valentine - now;
+
+    if (diff < 0) {
+      countdown.innerText = "Happy Valentine’s Day! 💖";
+      clearInterval(interval);
+      return;
+    }
+
+    const days = Math.floor(diff / (1000*60*60*24));
+    const hours = Math.floor((diff / (1000*60*60)) % 24);
+    const minutes = Math.floor((diff / (1000*60)) % 60);
+    const seconds = Math.floor((diff / 1000) % 60);
+
+    countdown.innerText = `${days}d ${hours}h ${minutes}m ${seconds}s until Valentine’s Day 💘`;
+  }
+
+  updateCountdown();
+  const interval = setInterval(updateCountdown, 1000);
 }
 
 /* Fireworks */
